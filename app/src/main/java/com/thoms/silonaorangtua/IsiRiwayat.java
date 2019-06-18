@@ -359,4 +359,10 @@ public class IsiRiwayat extends AppCompatActivity {
         Intent myIntent = new Intent(IsiRiwayat.this,RincianRiwayat.class);
         startActivity(myIntent);
     }
+
+    public void rincianSelasa(View view) {
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        startActivity(myIntent);
+    }
 }
