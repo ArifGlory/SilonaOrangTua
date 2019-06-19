@@ -42,7 +42,7 @@ public class RiwayatMapsActivity extends FragmentActivity implements OnMapReadyC
     FirebaseUser user;
     DatabaseReference ref;
     private SweetAlertDialog pDialogLoading,pDialodInfo;
-    private String idAnak;
+    private String idAnak,hari;
     Intent intent;
     List<LatLonKirim> listLatLon = new ArrayList<>();
 
@@ -62,6 +62,8 @@ public class RiwayatMapsActivity extends FragmentActivity implements OnMapReadyC
 
         intent = getIntent();
         idAnak = intent.getStringExtra("idAnak");
+        hari = intent.getStringExtra("hari");
+        Log.d("hari:",hari);
 
         pDialogLoading = new SweetAlertDialog(RiwayatMapsActivity.this, SweetAlertDialog.PROGRESS_TYPE);
         pDialogLoading.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
@@ -99,48 +101,77 @@ public class RiwayatMapsActivity extends FragmentActivity implements OnMapReadyC
         Calendar calendar = Calendar.getInstance();
         Date dates = calendar.getTime();
         String tanggal     = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String day         = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(dates.getTime());
-        String hari        = convertDayToHari(day);
+
         listLatLon.clear();
 
-        ref.child("Informasi_Anak").child(idAnak).child(hari).child("listLatLon").child(tanggal).addValueEventListener(new ValueEventListener() {
+        ref.child("Informasi_Anak").child(idAnak).child(hari).child("listLatLon").orderByKey().limitToLast(1).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 if (dataSnapshot.exists()){
+                    String lastTanggal = dataSnapshot.getValue().toString();
                     for (DataSnapshot child : dataSnapshot.getChildren()){
-                        LatLonKirim latLonKirim = child.getValue(LatLonKirim.class);
-                        listLatLon.add(latLonKirim);
-                        Log.d("latlon:",latLonKirim.latitude);
-
+                        lastTanggal = child.getKey();
                     }
-                    pDialogLoading.dismiss();
-                    //draw polygon
-                    for (int c=0;c<listLatLon.size();c++){
-                        LatLonKirim latlon = listLatLon.get(c);
-                        double lat = Double.parseDouble(latlon.getLatitude());
-                        double lon = Double.parseDouble(latlon.getLongitude());
+                    Log.d("lastTanggal:",lastTanggal);
 
-                        polygon.add(new LatLng(lat,lon));
-                    }
-                    polygon.fillColor(Color.parseColor("#8005B7E8")).strokeWidth(5).strokeColor(Color.CYAN);
-                    mMap.addPolygon(polygon);
+                    ref.child("Informasi_Anak").child(idAnak).child(hari).child("listLatLon").child(lastTanggal).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    int indexMid    = listLatLon.size() / 2;
-                    LatLonKirim latlonCenter   = listLatLon.get(indexMid);
-                    LatLng center = new LatLng(Double.parseDouble(latlonCenter.getLatitude()),Double.parseDouble(latlonCenter.getLongitude()));
-                    mMap.addMarker(new MarkerOptions().position(center)
-                        .title("Area yang dilewati anak"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
+                            if (dataSnapshot.exists()){
+                                for (DataSnapshot child : dataSnapshot.getChildren()){
+                                    LatLonKirim latLonKirim = child.getValue(LatLonKirim.class);
+                                    listLatLon.add(latLonKirim);
+                                    Log.d("latlon:",latLonKirim.latitude);
+
+                                }
+                                pDialogLoading.dismiss();
+                                //draw polygon
+                                for (int c=0;c<listLatLon.size();c++){
+                                    LatLonKirim latlon = listLatLon.get(c);
+                                    double lat = Double.parseDouble(latlon.getLatitude());
+                                    double lon = Double.parseDouble(latlon.getLongitude());
+
+                                    polygon.add(new LatLng(lat,lon));
+                                }
+                                polygon.fillColor(Color.parseColor("#8005B7E8")).strokeWidth(5).strokeColor(Color.CYAN);
+                                mMap.addPolygon(polygon);
+
+                                int indexMid    = listLatLon.size() / 2;
+                                LatLonKirim latlonCenter   = listLatLon.get(indexMid);
+                                LatLng center = new LatLng(Double.parseDouble(latlonCenter.getLatitude()),Double.parseDouble(latlonCenter.getLongitude()));
+                                mMap.addMarker(new MarkerOptions().position(center)
+                                        .title("Area yang dilewati anak"));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));
+
+                            }else {
+                                Log.d("getDataAnak","data tidak ada");
+                                pDialogLoading.dismiss();
+                                new SweetAlertDialog(RiwayatMapsActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                        .setTitleText("Oops...")
+                                        .setContentText("Belum ada data")
+                                        .show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            pDialogLoading.dismiss();
+                        }
+                    });
 
                 }else {
                     Log.d("getDataAnak","data tidak ada");
                     pDialogLoading.dismiss();
                     new SweetAlertDialog(RiwayatMapsActivity.this, SweetAlertDialog.ERROR_TYPE)
                             .setTitleText("Oops...")
-                            .setContentText("Terjadi kesalahan, coba lagi nanti")
+                            .setContentText("Belum ada data")
                             .show();
                 }
+
+
+
 
 
             }

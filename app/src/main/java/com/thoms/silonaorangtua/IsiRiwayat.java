@@ -31,7 +31,10 @@ import com.thoms.silonaorangtua.Model.AnakDaftar;
 import com.thoms.silonaorangtua.Model.RiwayatAnak;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -343,26 +346,103 @@ public class IsiRiwayat extends AppCompatActivity {
 
 
     public void rincianKamis(View v){
-        Intent myIntent = new Intent(IsiRiwayat.this,RincianRiwayat.class);
+        String hari        = "Kamis";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
         startActivity(myIntent);
     }
+
+    public void rincianSelasa(View v){
+        String hari        = "Selasa";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
+        startActivity(myIntent);
+    }
+
+    public void rincianSenin(View v){
+        String hari        = "Senin";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
+        startActivity(myIntent);
+    }
+
+    public void rincianRabu(View v){
+        String hari        = "Rabu";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
+        startActivity(myIntent);
+    }
+
+
+
     public void rincianJumat(View v){
-        Intent myIntent = new Intent(IsiRiwayat.this,RincianRiwayat.class);
+        String hari        = "Jumat";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
         startActivity(myIntent);
     }
     public void rincianSabtu(View v){
-        Intent myIntent = new Intent(IsiRiwayat.this,RincianRiwayat.class);
-        startActivity(myIntent);
-    }
-
-    public void rincianSenin(View view) {
-        Intent myIntent = new Intent(IsiRiwayat.this,RincianRiwayat.class);
-        startActivity(myIntent);
-    }
-
-    public void rincianSelasa(View view) {
+        String hari        = "Sabtu";
         Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
         myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
         startActivity(myIntent);
+    }
+
+    public void rincianMinggu(View v){
+        String hari        = "Minggu";
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
+        startActivity(myIntent);
+    }
+
+
+    public void goToRiwayatMaps(View view) {
+        Calendar calendar = Calendar.getInstance();
+        Date dates = calendar.getTime();
+        String tanggal     = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String day         = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(dates.getTime());
+        String hari        = convertDayToHari(day);
+
+        Intent myIntent = new Intent(IsiRiwayat.this,RiwayatMapsActivity.class);
+        myIntent.putExtra("idAnak",userid);
+        myIntent.putExtra("hari",hari);
+        startActivity(myIntent);
+    }
+
+    private String convertDayToHari(String day){
+        String hari = "";
+
+        switch (day){
+            case "Monday":
+                hari = "Senin";
+                break;
+            case "Tuesday":
+                hari = "Selasa";
+                break;
+            case "Wednesday":
+                hari = "Rabu";
+                break;
+            case "Thursday":
+                hari = "Kamis";
+                break;
+            case "Friday":
+                hari = "Jumat";
+                break;
+            case "Saturday":
+                hari = "Sabtu";
+                break;
+            case "Sunday":
+                hari = "Minggu";
+                break;
+        }
+
+        return hari;
     }
 }
