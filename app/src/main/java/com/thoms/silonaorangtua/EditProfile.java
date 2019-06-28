@@ -79,6 +79,7 @@ public class EditProfile extends AppCompatActivity {
     static final int RC_IMAGE_GALLERY = 2;
     Uri uriGambar,file;
     File fileGambar;
+    OrangtuaDaftar orangtuaDaftar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +130,7 @@ public class EditProfile extends AppCompatActivity {
         orangtuaReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                OrangtuaDaftar orangtuaDaftar = dataSnapshot.getValue(OrangtuaDaftar.class);
+                orangtuaDaftar = dataSnapshot.getValue(OrangtuaDaftar.class);
 
 
               etNama.setText(orangtuaDaftar.nama);
@@ -150,21 +151,26 @@ public class EditProfile extends AppCompatActivity {
         String getNama = etNama.getText().toString();
         String getPassword = etPassword.getText().toString();
 
-
-        if (getNama.equals("") || getNama.length() == 0
-                || getPassword.equals("") || getPassword.length() == 0
-        ) {
-
-            new SweetAlertDialog(EditProfile.this, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Oops...")
-                    .setContentText("Semua Field Harus diisi")
-                    .show();
-
-        }else if (uriGambar == null){
-           updateWithoutGambar();
+        if ( (orangtuaDaftar.nama.equals(getNama)) && (orangtuaDaftar.password.equals(getPassword)) ){
+            Toast.makeText(getApplicationContext(),"Anda tidak melakukan perubahan apapun",Toast.LENGTH_SHORT).show();
         }else {
-            uploadData(uriGambar);
+            if (getNama.equals("") || getNama.length() == 0
+                    || getPassword.equals("") || getPassword.length() == 0
+            ) {
+
+                new SweetAlertDialog(EditProfile.this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Oops...")
+                        .setContentText("Semua Field Harus diisi")
+                        .show();
+
+            }else if (uriGambar == null){
+                updateWithoutGambar();
+            }else {
+                uploadData(uriGambar);
+            }
         }
+
+
     }
 
     private void updateWithoutGambar(){
